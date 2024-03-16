@@ -1,13 +1,10 @@
 import { Dialog, Button, Flex, Text, TextField } from "@radix-ui/themes";
 import { useState } from "react";
+import useCreatePool from "../hooks/useCreatePool";
 
-
-
-const Popup = () => {
-    const [name, setName] = useState("Stablecoin Pool")
-    const [rate, setRate] = useState("4.5")
-
-
+const Popup = ({ name, setName }) => {
+    const [rate, setRate] = useState(0)
+    const handlePool = useCreatePool()
 
     return (<Dialog.Root>
         <Dialog.Trigger className="bg-blue-600 text-white text-center text-lg py-2">
@@ -33,7 +30,7 @@ const Popup = () => {
                         Pool&apos;s Reward Rate
                     </Text>
                     <TextField.Input
-                        defaultValue={`${rate} APY`}
+                        defaultValue={rate}
                         placeholder="Enter reward rate"
                         onChange={(e) => setRate(e.target.value)}
                     />
@@ -49,7 +46,7 @@ const Popup = () => {
                 <Dialog.Close>
                     <Button variant="soft"
                         color="blue"
-                        onClick={() => { }}
+                        onClick={() => handlePool(rate)}
                     >Create</Button>
                 </Dialog.Close>
             </Flex>

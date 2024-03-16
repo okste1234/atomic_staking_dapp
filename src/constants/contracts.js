@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
-import Abi from "./erc721.json";
+import Abi from "./staking.json";
 
-export const getNFTsContract = (providerOrSigner) =>
+export const getStakingContract = (providerOrSigner) =>
     new ethers.Contract(
         import.meta.env.VITE_contract_address,
         Abi,
