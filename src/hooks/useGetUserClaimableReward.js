@@ -1,34 +1,39 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import usePoolCreatedEvent from "./usePoolCreatedEvent";
 import { getStakingContract } from "../constants/contracts";
 import { readOnlyProvider } from "../constants/providers";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 
 const useGetUserClaimableReward = () => {
-    const poolId = usePoolCreatedEvent(); // Renamed 'no' to 'poolId' for clarity
+    const id = usePoolCreatedEvent()
 
-    const id = useMemo(() => poolId, [poolId]);
-    const { account: address } = useWeb3ModalAccount(); // 'address' changed to 'account'
+    // const id = useMemo(() => no, [no])
 
-    const [reward, setReward] = useState(0);
+    const { address } = useWeb3ModalAccount()
+
+
+    const [bal, setBal] = useState(0);
+
 
     useEffect(() => {
-        const fetchReward = async () => {
-            try {
-                const contract = getStakingContract(readOnlyProvider);
-                const item = await contract.getUserClaimableReward(id, address);
-                setReward(Number(item));
-            } catch (err) {
-                console.error("Error fetching reward: ", err);
-            }
-        };
+        (async () => {
+            const contract = getStakingContract(readOnlyProvider);
 
-        if (id && address) {
-            fetchReward();
-        }
+            contract
+                .getUserClaimableReward(id, address)
+                .then(item => {
+                    setBal(Number(item))
+
+                })
+                .catch((err) => {
+                    console.error("error getting bal: ", err);
+                });
+        })();
     }, [address, id]);
 
-    return reward;
+    return bal;
 };
 
 export default useGetUserClaimableReward;
+
+

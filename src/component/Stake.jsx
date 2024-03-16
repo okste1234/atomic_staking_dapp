@@ -18,14 +18,15 @@ const Stake = ({ name }) => {
     const { loading, data: pools } = pool
 
 
-    return (
+    console.log("pools ", pools);
 
-        <div className="grid gap-8 lg:grid-cols-3">
+    return (
+        <div>
             {loading ? (
                 <Text>Loading...</Text>
             ) : pools.length !== 0 ? (
                 pools.map(item => (
-                    <div key={item}>
+                    <div key={item} className="grid gap-8 lg:grid-cols-3">
                         <div className="flex flex-col gap-4 lg:col-span-2">
                             <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                                 <div className="grid w-full grid-cols-2 p-4 items-center">
@@ -33,11 +34,11 @@ const Stake = ({ name }) => {
                                         <h2 className="text-lg font-semibold">{name}</h2>
                                         <p className="text-sm font-medium leading-none text-gray-500">Earn {item.rewardRate}% APY</p>
                                     </div>
-                                    <div className="flex justify-end">
+                                    <div className="flex justify-end gap-4 items-center">
                                         <StakePopUp
                                             id={id}
                                         />
-                                        <Button size="sm" onClick={() => handleUnstake(id)}>Unstake</Button>
+                                        <Button size="sm" className="text-lg" onClick={() => handleUnstake(id)}>Unstake</Button>
                                     </div>
                                 </div>
                                 <div className="border-t border-gray-200 dark:border-gray-700" />

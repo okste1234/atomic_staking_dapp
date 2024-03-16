@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import usePoolCreatedEvent from "./usePoolCreatedEvent";
 import { getStakingContract } from "../constants/contracts";
 import { readOnlyProvider } from "../constants/providers";
 
 const useGetPoolById = () => {
-    const no = usePoolCreatedEvent()
+    const id = usePoolCreatedEvent()
 
-    const id = useMemo(() => no, [no])
+    // const id = useMemo(() => no, [no])
 
     const [pool, setPool] = useState({
         loading: true,
@@ -16,7 +16,6 @@ const useGetPoolById = () => {
 
     useEffect(() => {
         const contract = getStakingContract(readOnlyProvider);
-
         contract
             .getPoolByID(id)
             .then(item => {
@@ -28,7 +27,7 @@ const useGetPoolById = () => {
                 })
                 setPool({
                     loading: false,
-                    data: converted,
+                    data: Array(converted)
                 });
             })
             .catch((err) => {
