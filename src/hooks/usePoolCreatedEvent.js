@@ -29,13 +29,13 @@ const usePoolCreatedEvent = () => {
                     console.log("events ", events);
                 });
 
-            // const wssProvider2 = new ethers.WebSocketProvider(
-            //     import.meta.env.VITE_wss_rpc_url
-            // )
+            const wssProvider2 = new ethers.WebSocketProvider(
+                import.meta.env.VITE_wss_rpc_url
+            )
 
-            wssProvider.on(filter, eventListerner);
+            wssProvider2.on(filter, eventListerner);
 
-            return () => wssProvider.off(filter, eventListerner);
+            return () => wssProvider2.off(filter, eventListerner);
         })()
     }, [eventListerner]);
 
