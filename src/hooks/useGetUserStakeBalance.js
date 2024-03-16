@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import usePoolCreatedEvent from "./usePoolCreatedEvent";
 import { getStakingContract } from "../constants/contracts";
 import { readOnlyProvider } from "../constants/providers";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 
 const useGetUserStakeBalance = () => {
-    const id = usePoolCreatedEvent()
+    const no = usePoolCreatedEvent()
+
+    const id = useMemo(() => no, [no])
+
     const { address } = useWeb3ModalAccount()
 
 
@@ -13,19 +16,20 @@ const useGetUserStakeBalance = () => {
 
 
     useEffect(() => {
-        const contract = getStakingContract(readOnlyProvider);
+        (async () => {
+            const contract = getStakingContract(readOnlyProvider);
 
-        contract
-            .getUserStakeBalance(id, address)
-            .then(item => {
-                setBal(Number(item))
+            contract
+                .getUserStakeBalance(id, address)
+                .then(item => {
+                    setBal(Number(item))
 
-            })
-            .catch((err) => {
-                console.error("error fetching pool: ", err);
-                setBal(0);
-            });
-    }, [id, address]);
+                })
+                .catch((err) => {
+                    console.error("error fetching pool: ", err);
+                });
+        })();
+    }, [address, id]);
 
     return bal;
 };

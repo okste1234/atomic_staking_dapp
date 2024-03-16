@@ -13,6 +13,8 @@ const useCreatePool = () => {
 
         const contract = getStakingContract(signer);
 
+        console.log("presseddddddddd");
+
         try {
             const transaction = await contract.createPool(rate);
             console.log("transaction: ", transaction);

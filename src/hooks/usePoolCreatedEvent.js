@@ -4,39 +4,43 @@ import { wssProvider } from "../constants/providers";
 
 
 const usePoolCreatedEvent = () => {
-    const [id, setId] = useState(0);
+    const [id, setId] = useState();
 
     const eventListerner = useCallback((log) => {
-        const ids = String(log.topics[1])
+        const ids = String(log.data)
 
-        const decodedId = ethers.AbiCoder.defaultAbiCoder().decode(["uint256"], ids)
-        console.log("decodedResponses: ", ids);
+        const decodedId = ethers.AbiCoder.defaultAbiCoder().decode(["uint256", "uint256", "uint256", "address"], ids)
+        console.log("decodedResponses: ", ids[0]);
 
-        setId(decodedId)
+        setId(Number(decodedId))
     }, []);
 
 
     useEffect(() => {
-        const filter = {
-            address: import.meta.env.VITE_contract_address,
-            topics: [ethers.id("poolCreated(uint256,uint256,uint256,address)")],
-        };
-        wssProvider
-            .getLogs({ ...filter, fromBlock: 5465128 })
-            // eslint-disable-next-line no-unused-vars
-            .then((events) => {
-            });
+        (async () => {
+            const filter = {
+                address: import.meta.env.VITE_contract_address,
+                topics: [ethers.id("poolCreated(uint256,uint256,uint256,address)")],
+            };
+            wssProvider
+                .getLogs({ ...filter, fromBlock: 5498214 })
+                // eslint-disable-next-line no-unused-vars
+                .then((events) => {
+                    console.log("events ", events);
+                });
 
-        const wssProvider2 = new ethers.WebSocketProvider(
-            import.meta.env.VITE_wss_rpc_url
-        );
-        wssProvider2.on(filter, eventListerner);
+            // const wssProvider2 = new ethers.WebSocketProvider(
+            //     import.meta.env.VITE_wss_rpc_url
+            // )
 
-        return () => wssProvider2.off(filter, eventListerner);
+            wssProvider.on(filter, eventListerner);
+
+            return () => wssProvider.off(filter, eventListerner);
+        })()
     }, [eventListerner]);
 
 
-    return { id };
+    return id;
 };
 
 export default usePoolCreatedEvent;
