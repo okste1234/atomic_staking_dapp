@@ -7,15 +7,15 @@ import useGetUserStakeBalance from "../hooks/useGetUserStakeBalance";
 import StakePopUp from "./StakePopUp";
 import useUnStake from "../hooks/useUnstake";
 import useClaimReward from "../hooks/useClaimReward";
+import useEvents from "../hooks/useEvents";
 
 const Stake = ({ name }) => {
-    const { pool, id } = useGetPoolById();
     const reward = useGetUserClaimableReward();
     const balance = useGetUserStakeBalance();
     const handleUnstake = useUnStake()
     const handleClaim = useClaimReward()
-
-    const { loading, data: pools } = pool
+    const events = useEvents()
+    const { loading, data: pools } = useGetPoolById(events);
 
 
     console.log("pools ", pools);
@@ -25,8 +25,8 @@ const Stake = ({ name }) => {
             {loading ? (
                 <Text>Loading...</Text>
             ) : pools.length !== 0 ? (
-                pools.map(item => (
-                    <div key={item} className="grid gap-8 lg:grid-cols-3">
+                pools.map((item, index) => (
+                    <div key={index} className="grid gap-8 lg:grid-cols-3 mb-8">
                         <div className="flex flex-col gap-4 lg:col-span-2">
                             <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                                 <div className="grid w-full grid-cols-2 p-4 items-center">
@@ -36,9 +36,9 @@ const Stake = ({ name }) => {
                                     </div>
                                     <div className="flex justify-end gap-4 items-center">
                                         <StakePopUp
-                                            id={id}
+                                            id={index}
                                         />
-                                        <Button size="sm" className="text-lg" onClick={() => handleUnstake(id)}>Unstake</Button>
+                                        <Button size="sm" className="text-lg" onClick={() => handleUnstake(index)}>Unstake</Button>
                                     </div>
                                 </div>
                                 <div className="border-t border-gray-200 dark:border-gray-700" />
@@ -47,14 +47,14 @@ const Stake = ({ name }) => {
                                         <p className="text-xs leading-none text-gray-500">Total Stakers</p>
                                         <p className="text-2xl font-semibold">{item.totalStakers}</p>
                                         <p className="text-xs leading-none text-gray-500">Total Staked</p>
-                                        <p className="text-2xl font-semibold">SWCX{item.totalStaked}</p>
+                                        <p className="text-2xl font-semibold">{item.rewardReserve} sWCX</p>
                                     </div>
                                 </div>
                                 <div className="border-t border-gray-200 dark:border-gray-700" />
                                 <div className="p-4">
                                     <div className="flex flex-col gap-1">
                                         <p className="text-xs leading-none text-gray-500">APY Earnings</p>
-                                        <p className="text-sm font-medium">SWCX{balance}</p>
+                                        <p className="text-sm font-medium">{balance(index)} sWCX</p>
                                     </div>
                                 </div>
                                 <div className="border-t border-gray-200 dark:border-gray-700" />
@@ -62,9 +62,9 @@ const Stake = ({ name }) => {
                                     <div className="flex justify-between">
                                         <div className="flex flex-col gap-1">
                                             <p className="text-xs leading-none text-gray-500">APY Earnings</p>
-                                            <p className="text-sm font-medium">RWCX{reward}</p>
+                                            <p className="text-sm font-medium">{reward(index)} rWCX</p>
                                         </div>
-                                        <Button onClick={() => handleClaim(id)}>Claim Reward</Button>
+                                        <Button onClick={() => handleClaim(index)}>Claim Reward</Button>
                                     </div>
                                 </div>
                             </div>

@@ -1,43 +1,93 @@
 import { useEffect, useState } from "react";
-import usePoolCreatedEvent from "./usePoolCreatedEvent";
 import { getStakingContract } from "../constants/contracts";
 import { readOnlyProvider } from "../constants/providers";
+import { ethers } from "ethers";
+import Abi from "../constants/staking.json"
+import multicallAbi from '../constants/multicall.json'
+import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 
-const useGetPoolById = () => {
-    const id = usePoolCreatedEvent()
-
-    // const id = useMemo(() => no, [no])
-
+const useGetPoolById = (event) => {
     const [pool, setPool] = useState({
         loading: true,
         data: [],
     });
+    const { address } = useWeb3ModalAccount()
 
 
     useEffect(() => {
-        const contract = getStakingContract(readOnlyProvider);
-        contract
-            .getPoolByID(id)
-            .then(item => {
-                const converted = ({
-                    totalStakers: Number(item[0]),
-                    totalStaked: Number(item[1]),
-                    rewardReserve: Number(item[2]),
-                    rewardRate: Number(item[3])
+        (async () => {
+            const itf = new ethers.Interface(Abi);
+            const contract = getStakingContract(readOnlyProvider);
+            const data = await contract.id();
+            const _poolCount = Number(data.toString());
+            let calls = [];
+            if (!address) return;
+            for (let i = 0; i < _poolCount; i++) {
+                calls.push({
+                    target: import.meta.env.VITE_contract_address,
+                    callData: itf.encodeFunctionData("getPoolByID", [i]),
                 })
-                setPool({
-                    loading: false,
-                    data: Array(converted)
-                });
-            })
-            .catch((err) => {
-                console.error("error fetching pool: ", err);
-                setPool((prev) => ({ ...prev, loading: false }));
-            });
-    }, [id]);
 
-    return { pool, id };
-};
+            }
+
+            for (let i = 0; i < _poolCount; i++) {
+                calls.push({
+                    target: import.meta.env.VITE_contract_address,
+                    callData: itf.encodeFunctionData("getUserStakeBalance", [i, address]),
+                })
+
+            }
+
+            const multicall = new ethers.Contract(
+                import.meta.env.VITE_multicall_address,
+                multicallAbi,
+                readOnlyProvider
+            );
+
+            const callResults = await multicall.tryAggregate.staticCall(
+                false,
+                calls
+            );
+            let poolResponse = []
+            let stakeBalanceResponse = [];
+
+            for (let i = 0; i < callResults.length / 2; i++) {
+                // const element = array[i];
+                poolResponse.push(itf.decodeFunctionResult("getPoolByID", callResults[i][1]))
+
+            }
+
+            for (let i = callResults.length / 2; i < callResults.length; i++) {
+                // const element = array[i];
+                stakeBalanceResponse.push(itf.decodeFunctionResult("getUserStakeBalance", callResults[i][1]))
+
+            }
+
+
+            // const response = callResults.map((res: any) => (itf.decodeFunctionResult("getPoolByID", res[1])));
+            let _pools = [];
+            for (let i = 0; i < poolResponse.length; i++) {
+                const obj = poolResponse[i][0];
+                _pools.push({
+                    totalStakers: Number(obj.totalStakers.toString()),
+                    rewardRate: Number(obj.rewardRate.toString()),
+                    rewardReserve: Number(obj.rewardReserve.toString()),
+                    totalStaked: Number(obj.totalStaked.toString()),
+                    stakeBalance: Number(stakeBalanceResponse[i])
+                })
+
+            }
+            setPool({
+                loading: false,
+                data: _pools
+            })
+        })()
+
+
+    }, [address, event])
+    return pool;
+}
+
 
 export default useGetPoolById;
 

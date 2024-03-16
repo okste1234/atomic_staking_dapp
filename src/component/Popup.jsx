@@ -7,7 +7,7 @@ const Popup = ({ name, setName }) => {
     const handlePool = useCreatePool()
 
     return (<Dialog.Root>
-        <Dialog.Trigger className="bg-blue-600 text-white text-center text-lg py-2">
+        <Dialog.Trigger className="bg-gray-600 text-white text-center text-lg py-2">
             <Button>Create Pool</Button>
         </Dialog.Trigger>
 
