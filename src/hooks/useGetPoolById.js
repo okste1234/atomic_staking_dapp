@@ -6,7 +6,7 @@ import Abi from "../constants/staking.json"
 import multicallAbi from '../constants/multicall.json'
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 
-const useGetPoolById = (event) => {
+const useGetPoolById = (event, name) => {
     const [pool, setPool] = useState({
         loading: true,
         data: [],
@@ -73,7 +73,8 @@ const useGetPoolById = (event) => {
                     rewardRate: Number(obj.rewardRate.toString()),
                     rewardReserve: Number(obj.rewardReserve.toString()),
                     totalStaked: Number(obj.totalStaked.toString()),
-                    stakeBalance: Number(stakeBalanceResponse[i])
+                    stakeBalance: Number(stakeBalanceResponse[i]),
+                    name: name,
                 })
 
             }
@@ -84,7 +85,7 @@ const useGetPoolById = (event) => {
         })()
 
 
-    }, [address, event])
+    }, [address, event, name])
     return pool;
 }
 

@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-// import usePoolCreatedEvent from "./usePoolCreatedEvent";
+import usePoolCreatedEvent from "./usePoolCreatedEvent";
 import { getStakingContract } from "../constants/contracts";
 import { readOnlyProvider } from "../constants/providers";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
-import { useCallback } from "react";
 
-const useGetUserClaimableReward = (id) => {
-    // const id = usePoolCreatedEvent()
+const useGetUserClaimableReward = () => {
+    const id = usePoolCreatedEvent()
 
     // const id = useMemo(() => no, [no])
 
@@ -32,11 +31,7 @@ const useGetUserClaimableReward = (id) => {
         })();
     }, [address, id]);
 
-    return useCallback(() => {
-        bal
-    },
-        [bal],
-    )
+    return bal;
 };
 
 export default useGetUserClaimableReward;

@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
-// import usePoolCreatedEvent from "./usePoolCreatedEvent";
+import { useEffect, useState } from "react";
+import usePoolCreatedEvent from "./usePoolCreatedEvent";
 import { getStakingContract } from "../constants/contracts";
 import { readOnlyProvider } from "../constants/providers";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 
-const useGetUserStakeBalance = (id) => {
-    // const id = usePoolCreatedEvent()
+const useGetUserStakeBalance = () => {
+    const id = usePoolCreatedEvent()
 
     // const id = useMemo(() => no, [no])
 
@@ -31,11 +31,7 @@ const useGetUserStakeBalance = (id) => {
         })();
     }, [address, id]);
 
-    return useCallback(() => {
-        bal
-    },
-        [bal],
-    )
+    return bal;
 };
 
 export default useGetUserStakeBalance;
